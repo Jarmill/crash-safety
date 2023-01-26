@@ -65,7 +65,7 @@ lsupp.X_term = [[c1f; c2f] >= 0;zcon];
 
 
 %% solve the program 
-order_list = 1:3; 
+order_list = 1:5; 
 NP = size(X0, 2);
 sol = cell(NP, length(order_list));
 z_opt = zeros(NP, length(order_list));
