@@ -35,7 +35,8 @@ classdef location_crash_interface < handle
         end
         
         %% Set up the program
-        function [prog]= make_program(obj, d)
+        function [prog]= make_program(obj, order)
+            d = 2*order
             %Form the SOS program associated with this problem
             [poly_var, coeff_var] = obj.make_poly(d);
             
@@ -55,7 +56,7 @@ classdef location_crash_interface < handle
             
             prog = struct('poly', poly_var, ...
                 'objective', objective, 'coeff', coeff, 'con', con,... 
-                'order', d/2);
+                'order', order);
         end
         
         function [poly_out, coeff_out] = make_poly(obj,d)
@@ -75,10 +76,7 @@ classdef location_crash_interface < handle
             
             %The higher programs may create other variables
             %   gamma:          peak estimation
-            %   w(x):           reachable set
-            %   gamma and w(x): distance estimation
-            %             gamma = sdpvar(1,1);
-
+  
             %the number of half-space constraints in the uncertainty
             
             
