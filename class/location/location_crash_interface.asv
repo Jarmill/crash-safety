@@ -246,13 +246,6 @@ classdef location_crash_interface < handle
                     cons_equal = (coefficients(equal_j, [t; x; z]) == 0);
                     cons_lie = [cons_lie; cons_equal:['Lie input ', num2str(j), ' duality']];
                 end
-                
-                if ~isempty(G)
-                    %lifting variables in polytope description
-                    coeff_lift = coefficients(G'*zeta, [t; x; z]);
-                    cons_lift = (reshape(coeff_lift, [], 1) == 0);
-                    cone_lie = [cons_lie; cons_lift:'Lifting'];
-                end
 
 
 

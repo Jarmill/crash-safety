@@ -50,7 +50,7 @@ classdef loc_sos_options
         function Tsupp = get_t_supp(obj)
             %get time support
             Tsupp = struct('ineq', [], 'eq', []);
-            t = obj.vars.t;
+            t = obj.t;
             if obj.scale
                 Tsupp.ineq = t*(1-t);
             else

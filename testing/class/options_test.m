@@ -34,3 +34,5 @@ lsupp.fw = model.fw;
 lsupp.poly = poly;
 lsupp.Tmax = Tmax;
 lsupp.Zmax = Zmax;
+
+lsupp.get_all_supp()
