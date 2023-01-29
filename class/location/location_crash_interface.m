@@ -11,7 +11,7 @@ classdef location_crash_interface < handle
 
         opts = []; %includes support set
         
-        vars = struct('t', [], 'x', [], 'z', []);
+%         vars = struct('t', [], 'x', [], 'z', []);
         
     end
     
@@ -20,7 +20,7 @@ classdef location_crash_interface < handle
             %LOCATION_SOS_INTERFACE Construct an instance of this class
             %   Detailed explanation goes here
             obj.opts = opts;
-            obj.vars = struct('t', opts.t, 'x', opts.x, 'z', opts.z);            
+%             obj.vars = struct('t', opts.t, 'x', opts.x, 'z', opts.z);            
             
             if isempty(obj.opts.t) && ~opts.TIME_INDEP
                 obj.opts.t = sdpvar(1, 1);
@@ -69,10 +69,11 @@ classdef location_crash_interface < handle
             [v, cv] = polynomial([t; x; z], d);
 
             %every application includes an initial set valuation of v
-            if ~obj.opts.TIME_INDEP
-                v0 = replace(v, t, 0);
+            v0 = replace(v, t, 0)
+            if obj.opts.scale
+                vT = replace(v, t, 1);
             else
-                v0 = v;
+                vT = replace(v, t, obj.opts.Tmax);
             end
             
             %The higher programs may create other variables
@@ -89,11 +90,11 @@ classdef location_crash_interface < handle
                 m = length(obj.opts.poly.b);
                 d_altern = d;
                 for i = 1:size(obj.opts.fw, 2)
-                    d_altern = max((2*ceil(d/2 + degree(obj.opts.fw(:, i))/2-1)), d_altern); %figure out degree bounds later
+                    d_altern = max((2*ceil(d/2 + degree(obj.opts.fw(:, i))/2-1)), d_altern)-1; %figure out degree bounds later
                 end
 
                 for i = 1:m
-                    [pzeta, czeta] = polynomial([t; x], d_altern);
+                    [pzeta, czeta] = polynomial([t; x; z], d_altern);
                     zeta = [zeta; pzeta];
                     coeff_zeta = [coeff_zeta; czeta];
                 end
@@ -109,8 +110,31 @@ classdef location_crash_interface < handle
                 coeff_alpha = [];
             end
             
-            poly_out=struct('v', v, 'zeta', zeta, 't', t, 'x', x, 'v0', v0, 'alpha', alpha);
+            poly_out=struct('v', v, 'zeta', zeta, 't', t, 'x', x, 'alpha', alpha, ...
+                'z', z, 'v0', v0, 'vT', vT);
             coeff_out = [cv; coeff_zeta;coeff_alpha];
+        end
+        
+        %% constraints
+        
+        function [coeff, con, nonneg] = make_cons(obj, d, poly)
+            %METHOD1 Summary of this method goes here
+            %   Detailed explanation goes here
+
+            
+            %objective constraint (terminal)
+            [coeff_term, con_term, nonneg_term] = obj.make_term_con(d, poly);
+            
+            %initial constraint in v0
+            [coeff_init, con_init, nonneg_init] = obj.make_init_con(d, poly);
+                        
+            %lie derivative constraint
+            [coeff_lie, con_lie, nonneg_lie] = obj.make_lie_con(d, poly);
+            
+            %package up the constraints
+            coeff = [coeff_lie; coeff_term; coeff_init];
+            con = [con_lie; con_term; con_init];
+            nonneg = [nonneg_init; nonneg_term; nonneg_lie];
         end
         
         function [coeff_lie, cons_lie, nonneg_lie] = make_lie_con(obj, d, poly)        
@@ -123,9 +147,9 @@ classdef location_crash_interface < handle
             zeta = poly.zeta;
             
             %variables
-            t = obj.vars.t;
-            x = obj.vars.x;
-            z = obj.vars.x;
+            t = poly.t;
+            x = poly.x;
+            z = poly.z;
             
             if obj.opts.scale && ~obj.opts.TIME_INDEP
                 scale_weight = obj.opts.Tmax;
@@ -262,7 +286,7 @@ classdef location_crash_interface < handle
                     zeta_curr = zeta(j);
                     d_zeta = degree(zeta_curr);
                     
-                    [conszeta, coeffzeta] =  obj.make_psatz(d_zeta, Xall, zeta_curr, [t;x]);
+                    [conszeta, coeffzeta] =  obj.make_psatz(d_zeta, Xall, zeta_curr, [t;x;z]);
 %                     [pzeta, conszeta, coeffzeta] = constraint_psatz(zeta_curr, Xall, [t;x], d_zeta);
 
                     coeff_lie = [coeff_lie; coeffzeta];
@@ -303,7 +327,7 @@ classdef location_crash_interface < handle
                 out.block.monom = monom;
                 out.block.Gram = Gram;
                 out.block.residual = residual;     
-                out.obj = value(prog.objective);
+                out.obj = value(-prog.objective); %maximize objective                
                 out.order = prog.order;                
                 
             end
@@ -313,9 +337,8 @@ classdef location_crash_interface < handle
         
         
         function out = run(obj, order)
-            %the main routine, run the SOS program at the target order
-            d = 2*order;
-            prog = obj.make_program(d);
+            %the main routine, run the SOS program at the target order            
+            prog = obj.make_program(order);
             fprintf('Solving Program\n')
             out= solve_program(obj, prog);
         end
@@ -326,15 +349,18 @@ classdef location_crash_interface < handle
         
             t = poly_var.t;
             x = poly_var.x;
+            z = poly_var.z;
+            
+            main_vars = [t; x; z];
             n = length(poly_var.x);
             
             %solved coefficients of v and zeta
-            [cv,mv] = coefficients(poly_var.v,[poly_var.t; poly_var.x]);
+            [cv,mv] = coefficients(poly_var.v,main_vars);
             v_eval = value(cv)'*mv;                                   
             
             %remember to scale by time 
             
-            [cz, mz] = coefficients(poly_var.zeta,[poly_var.t; poly_var.x]);
+            [cz, mz] = coefficients(poly_var.zeta,main_vars);
             if n == 1
                 zeta_eval = value(cz)'*mz;
             else
@@ -342,7 +368,7 @@ classdef location_crash_interface < handle
             end                     
             
             %nonnegative evaluation
-            [cnn,mnn] = coefficients(poly_var.nonneg,[poly_var.t; poly_var.x]);
+            [cnn,mnn] = coefficients(poly_var.nonneg,main_vars);
             nn_eval = value(cnn)*mnn;
 
             %the replacement call to scale time by Tmax is expensive (in
@@ -354,9 +380,9 @@ classdef location_crash_interface < handle
             
             % form functions using helper function 'polyval_func'
             func_eval = struct;
-            func_eval.v = polyval_func(v_eval, [t; x]);
-            func_eval.zeta = polyval_func(zeta_eval, [t; x]);       
-            func_eval.nonneg = polyval_func(nn_eval, [t;x; obj.opts.w]);            
+            func_eval.v = polyval_func(v_eval, main_vars);
+            func_eval.zeta = polyval_func(zeta_eval, main_vars);       
+            func_eval.nonneg = polyval_func(nn_eval, [main_vars; obj.opts.w]);            
         end
     
         function dynamics = package_dynamics(obj, func_in)
@@ -381,20 +407,20 @@ classdef location_crash_interface < handle
             %This is old sampler code as a kludge. 
             
             %event handle
-            dynamics.Xval = constraint_func(obj.opts.X, obj.vars.x);
+            dynamics.Xval = constraint_func(obj.opts.X, obj.opts.x);
             dynamics.event = {@(t,x,w) support_event(t, x, dynamics.Xval, ...
                 0, obj.opts.Tmax)};
             
             
             %dynamics handle (time-varying polytopic uncertainty called 'd'
             %here)
-            dynamics.f0= polyval_func(obj.opts.f0, [obj.vars.t; obj.vars.x]);
+            dynamics.f0= polyval_func(obj.opts.f0, [obj.opts.t; obj.opts.x]);
 %             
             if isempty(obj.opts.fw)
-                dynamics.fw = @(vars_in) zeros(size(obj.vars.x));
+                dynamics.fw = @(vars_in) zeros(size(obj.opts.x));
                 dynamics.f = {@(t,x,w,d,b) dynamics.f0([t; x])};
             else
-                dynamics.fw = polyval_func(obj.opts.fw, [obj.vars.t; obj.vars.x]);
+                dynamics.fw = polyval_func(obj.opts.fw, [obj.opts.t; obj.opts.x]);
                 dynamics.f = {@(t,x,w,d,b) dynamics.f0([t; x]) + dynamics.fw([t; x])*d};
             end
             
@@ -445,7 +471,31 @@ classdef location_crash_interface < handle
                 coeff = [];
             end
             
-        end                                                        
+        end    
+        
+        function [coeff, con, nonneg] = make_term_con(obj, d, poly)
+            %Constraint on terminal measure
+            %auxiliary function v(t, x) upper bounds objective beta'p(x)
+            
+%             XT = prep_space_cell(obj.opts.X_term);
+            
+            %peak estimation is over all time
+            Xterm = obj.opts.get_X_term();
+            
+
+            
+            coeff = [];
+            con = [];
+
+            term_pos = poly.z - poly.vT;
+            
+            [con_term, coeff_term] = obj.make_psatz(d, Xterm, term_pos, [poly.x; poly.z]);
+            
+            coeff = [coeff_term];
+            con = [con_term:'Terminal'];
+            
+            nonneg = term_pos;
+        end
         
     end
     
@@ -455,13 +505,8 @@ classdef location_crash_interface < handle
         get_objective(obj, poly)
         %fetch the SOS objective to minimize
         
-        make_cons(obj, poly)
-        %make constraints for the SOS program
-        
         make_init_con(obj, poly)
         %Constraint on initial measure
         
-        make_term_con(obj, poly)
-        %constraint on terminal measure
     end
 end

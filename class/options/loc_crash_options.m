@@ -5,6 +5,8 @@ classdef loc_crash_options < loc_sos_options
         %dominant change: add the 'z' variable to perform the peak
         %minimizing control.
         Zmax = 1;
+        z = [];
+        w = [];
     end
     
     methods
@@ -12,7 +14,7 @@ classdef loc_crash_options < loc_sos_options
             %LOC_CRASH_OPTIONS 
             obj@loc_sos_options();
             
-            obj.vars.z = sdpvar(1,1);
+            obj.z = sdpvar(1,1);
         end
         
         function Xsupp = get_X(obj)
@@ -33,12 +35,16 @@ classdef loc_crash_options < loc_sos_options
         end
         
         function Xsupp = get_X_term(obj)
-            Xsupp = get_X_term@loc_sos_options(obj);
+            %terminal set with x
+            Xsupp = obj.X_term;
+            if isempty(Xsupp)
+                Xsupp = obj.X;
+            end
             Xsupp.ineq = [Xsupp.ineq; obj.get_Z()];
         end
         
         function Z = get_Z(obj)
-            z = obj.vars.z;
+            z = obj.z;
             Z = z*(obj.Zmax - z);
         end
     end
