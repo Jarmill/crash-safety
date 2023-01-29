@@ -36,7 +36,7 @@ classdef location_crash_interface < handle
         
         %% Set up the program
         function [prog]= make_program(obj, order)
-            d = 2*order
+            d = 2*order;
             %Form the SOS program associated with this problem
             [poly_var, coeff_var] = obj.make_poly(d);
             
@@ -155,7 +155,7 @@ classdef location_crash_interface < handle
                 w = obj.opts.w;
                 
                 %stack the support set
-                lin_term = obj.opts.poly.b - obj.opts.poly.A*w;
+                lin_term = z*obj.opts.poly.b - obj.opts.poly.A*w;
                 if ~isempty(obj.opts.poly.G)
                     tau = sdpvar(size(obj.opts.poly.G, 2), 1);
                     lin_term = lin_term - obj.opts.poly.G*tau;
@@ -217,7 +217,7 @@ classdef location_crash_interface < handle
 
                     %Aw <= b
 %                     [consf0, coefff0] =  obj.make_psatz(d, Xall, Lv0+b'*zeta, [t;x]);
-                    [consf0, coefff0] =  obj.make_psatz(d, Xall, Lv0 -poly.alpha-b'*zeta, [t;x; z]);
+                    [consf0, coefff0] =  obj.make_psatz(d, Xall, Lv0 -poly.alpha-z*b'*zeta, [t;x; z]);
 
                     %alpha: useful for time-independent uncertainty in
                     %finite time
