@@ -40,8 +40,12 @@ Xu = Cu + circ_half* Ru;
 
 %% sample a pair of trajectories
 
-X0 = [0.395, 1.21; ...
+% X0 = [0.395, 1.21; ...
+%     1.279, -1.21];
+
+X0 = [0.3948, 1.21; ...
     1.279, -1.21];
+
 
 NP = size(X0, 2);
 
@@ -61,14 +65,16 @@ for i = 1:NP
 end
 
 %% plot the field
+Ntheta = 100;
+x_dist = dist_contour(Ntheta, Ru, max(dist_close)) + Cu;
 
 cc = linspecer(4);
 
 figure(2)
 clf
-tiledlayout(1, 2)
+% tiledlayout(1, 2)
 
-t1 = nexttile;
+% t1 = nexttile;
 hold on
 streamslice(XX, YY, UU, VV)
 
@@ -81,25 +87,34 @@ for i = 1:NP
     plot(osm{i}.y(1, :), osm{i}.y(2, :), 'LineWidth', 3, 'color', cc(2+i, :));
 end
 scatter(X0(:, 1), X0(:, 2), 100, 'k')
+plot(x_dist(1, :), x_dist(2, :), 'LineWidth', 3, 'color', 'r');
 
-t2 = nexttile;
-hold on
-quiver(XX, YY, UU, VV, 4)
-% streamline(stream2(XX, YY, UU, VV, XX, YY))
-% streamslice(XX, YY, UU, VV)
+xlabel('x_1')
+ylabel('x_2')
 
-patch(Xu(1, :), Xu(2, :), 'r', 'Linewidth', 3, 'EdgeColor', 'none', 'DisplayName', 'Unsafe Set')
-   axis equal
-
-for i = 1:NP
-    plot(osm{i}.y(1, :), osm{i}.y(2, :), 'LineWidth', 3, 'color', cc(2+i, :));
-end
-
-scatter(X0(:, 1), X0(:, 2), 100, 'k')
-
-xlim([-BOX, BOX])
-ylim([-BOX, BOX])
-
+% t2 = nexttile;
+% hold on
+% quiver(XX, YY, UU, VV, 4)
+% 
+% Ntheta = 100;
+% x_dist = dist_contour(Ntheta, Ru, max(dist_close)) + Cu;
+% % streamline(stream2(XX, YY, UU, VV, XX, YY))
+% % streamslice(XX, YY, UU, VV)
+% 
+% patch(Xu(1, :), Xu(2, :), 'r', 'Linewidth', 3, 'EdgeColor', 'none', 'DisplayName', 'Unsafe Set')
+%    axis equal
+% 
+% for i = 1:NP
+%     plot(osm{i}.y(1, :), osm{i}.y(2, :), 'LineWidth', 3, 'color', cc(2+i, :));
+% end
+% 
+% plot(x_dist(1, :), x_dist(2, :), 'LineWidth', 3, 'color', 'r');
+% 
+% scatter(X0(:, 1), X0(:, 2), 100, 'k')
+% 
+% xlim([-BOX, BOX])
+% ylim([-BOX, BOX])
+% 
 
 %% function helpers
 function dist_out = half_circ_dist(x_in, R)
@@ -132,3 +147,20 @@ function dist_out = aff_half_circ_dist(x_in, R, theta_c, Cu)
 
 end
    
+function x_dist = dist_contour(Ntheta, R, c)
+    %compute a contour at distance c away from the half-circle with N_theta
+    %sample points
+
+
+    theta_q1 = linspace(0, pi/2, Ntheta);
+    theta_q2 = linspace(pi/2, pi, Ntheta);
+    theta_q34 = linspace(pi, 2*pi, 2*Ntheta);
+
+    %contour level
+    
+
+    x_right = [c*cos(theta_q1)+R; c*sin(theta_q1)];
+    x_left = [c*cos(theta_q2)-R; c*sin(theta_q2)];
+    x_bottom = [(c+R)*cos(theta_q34); (c+R)*sin(theta_q34)];
+    x_dist = [x_right, x_left, x_bottom];
+end

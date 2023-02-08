@@ -33,7 +33,7 @@ classdef crash_sos < location_crash_interface
             %Constraint on initial measure
             %auxiliary function v(t,x) lower bounded by gamma
             
-            X0 = prep_space_cell(obj.opts.X_init); %not get_X_init()
+            X0 = obj.prep_space_cell(obj.opts.X_init); %not get_X_init()
  
             coeff = [];
             con = [];
