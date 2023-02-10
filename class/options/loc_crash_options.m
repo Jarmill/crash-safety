@@ -6,7 +6,6 @@ classdef loc_crash_options < loc_sos_options
         %minimizing control.
         Zmax = 1;
         z = [];
-        w = [];
     end
     
     methods

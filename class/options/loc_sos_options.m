@@ -38,7 +38,7 @@ classdef loc_sos_options
         poly = struct('A', [], 'b', [], 'G', []);
         
         %w | exists tau: Aw + Gtau <= b
-        
+        w = [];
         %scale time from [0, Tmax] to [0, 1]?
         scale = 1;
         
