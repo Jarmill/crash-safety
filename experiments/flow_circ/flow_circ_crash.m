@@ -15,16 +15,15 @@ f_true = @(t, x) [x(2); -x(1) + (1/3).* x(1).^3 - x(2)];
 
 
 % Nsample = 100;
-Nsample = 50;
-% Nsample = 40;
+% Nsample = 50;
+Nsample = 40;
 % Nsample = 30;
 % Nsample = 20;
 % Nsample = 4;
 box_lim = 2;
-Tmax = 6;
+Tmax = 5;
 % epsilon = 2;
-% epsilon = [0; 2.5];
-epsilon = [0; 1];
+epsilon = [0; 0.5];
 sample = struct('t', Tmax, 'x', @() box_lim*(2*rand(2,1)-1));
 
 
@@ -42,11 +41,16 @@ mlist = monolist(x, 3);
 model = struct('f0', [x(2);0], 'fw', [zeros(1, length(mlist)); mlist']);
 
 W = DG.data_cons(model, x, observed);
-[model_cheb,W_cheb] = DG.center_cheb(model, W);
-W_red = DG.reduce_constraints(W_cheb);
+W.b = W.b - epsilon(2);
 
+%TODO: write code to prune constraints/possibly trivial faces
 
-model = model_cheb;
+%modify W for the crash program
+% [model_cheb,W_cheb] = DG.center_cheb(model, W);
+% W_red = DG.reduce_constraints(W_cheb);
+W_red = W;
+
+% model = model_cheb;
 W = W_red;
 [w_handle, box]= DG.make_sampler(W);
 
@@ -60,9 +64,9 @@ if SOLVE
 %     C0 = [1.5; 0];
 % %     C0 = [-1; 0];
     R0 = 0.2;
-C0 = [1.5; 0];
+C0 = [1; 0];
 % R0 = 0.4;
-    INIT_POINT = 0;
+    INIT_POINT = 1;
     if INIT_POINT
         X0 = C0;
     else
@@ -73,7 +77,7 @@ C0 = [1.5; 0];
     
 %     Ru = 0.3;
 %     Cu = [0; -0.5];
-Cu = [0; -0.7];
+Cu = [-0.25; -0.7];
 Ru = 0.5;
     c1f = Ru^2 - sum((x-Cu).^2);
 %     c2f = -diff(x-Cu);
@@ -97,8 +101,12 @@ Ru = 0.5;
     lsupp.f0 = model.f0;
     lsupp.fw = model.fw;
     lsupp.Tmax = Tmax;
-    lsupp.poly = W;
+    lsupp.W = W;
+    lsupp.recover=0;
 
+    
+    lsupp.recover=0;
+    
     lsupp.verbose = 1;
 
 %     objective = x(1);
@@ -108,10 +116,16 @@ Ru = 0.5;
     %% start up tester
     PM = crash_sos(lsupp);
 
-%     order = 4;
-% order=3; %5.4274e-01 safe
-    order = 2; %  1.4189e-02 safe?
-    d = 2*order;
+    
+    %INIT_POINT = 1
+    order = 4;
+% order=3; %  5.0660e-01
+%     order = 2; %  4.6207e-01
+%     order = 1; %4.6166e-01
+
+
+
+    d = 2*order; 
 
     % [prog]= PM.make_program(d);
     % out = PM.solve_program(prog)

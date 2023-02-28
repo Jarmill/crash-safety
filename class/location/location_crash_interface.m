@@ -26,8 +26,8 @@ classdef location_crash_interface < handle
                 obj.opts.t = sdpvar(1, 1);
             end
             
-            if ~isempty(obj.opts.poly)
-                obj.opts.poly.b = reshape(obj.opts.poly.b, [], 1);
+            if ~isempty(obj.opts.W)
+                obj.opts.W.b = reshape(obj.opts.W.b, [], 1);
             end
             
             
@@ -69,7 +69,7 @@ classdef location_crash_interface < handle
             [v, cv] = polynomial([t; x; z], d);
 
             %every application includes an initial set valuation of v
-            v0 = replace(v, t, 0)
+            v0 = replace(v, t, 0);
             if obj.opts.scale
                 vT = replace(v, t, 1);
             else
@@ -85,16 +85,18 @@ classdef location_crash_interface < handle
             zeta = [];
             coeff_zeta = [];
             
-            if ~isempty(obj.opts.poly) && isempty(obj.opts.w)
+            if ~isempty(obj.opts.W) && isempty(obj.opts.w)
 
-                m = length(obj.opts.poly.b);
+                m = length(obj.opts.W.b);
                 d_altern = d;
                 for i = 1:size(obj.opts.fw, 2)
                     d_altern = max((2*ceil(d/2 + degree(obj.opts.fw(:, i))/2-1)), d_altern)-1; %figure out degree bounds later
                 end
 
                 for i = 1:m
-                    [pzeta, czeta] = polynomial([t; x; z], d_altern);
+                    %important that the degree is d_altern-1 due to the
+                    %z*zeta multiplication
+                    [pzeta, czeta] = polynomial([t; x; z], max(d_altern-1, 0));
                     zeta = [zeta; pzeta];
                     coeff_zeta = [coeff_zeta; czeta];
                 end
@@ -178,11 +180,11 @@ classdef location_crash_interface < handle
                 
                 w = obj.opts.w;
                 
-                %stack the support set
-                lin_term = z*obj.opts.poly.b - obj.opts.poly.A*w;
-                if ~isempty(obj.opts.poly.G)
-                    tau = sdpvar(size(obj.opts.poly.G, 2), 1);
-                    lin_term = lin_term - obj.opts.poly.G*tau;
+                %stack the support set                
+                lin_term = z + obj.opts.W.b - obj.opts.W.A*w;
+                if ~isempty(obj.opts.W.G)
+                    tau = sdpvar(size(obj.opts.W.G, 2), 1);
+                    lin_term = lin_term - obj.opts.W.G*tau;
                 else
                     tau = [];
                 end
@@ -219,9 +221,9 @@ classdef location_crash_interface < handle
                 
                 %uncertainty constraint Aw <= b
 
-                A = obj.opts.poly.A;
-                G = obj.opts.poly.G;
-                b = obj.opts.poly.b;
+                A = obj.opts.W.A;
+                G = obj.opts.W.G;
+                b = obj.opts.W.b;
                 [m, num_input] = size(A); %number of constraints
                 p = size(G, 2);
             
@@ -239,9 +241,9 @@ classdef location_crash_interface < handle
 %                       %Aw >= b
 %                     [consf0, coefff0] =  obj.make_psatz(d, Xall, Lv0-b'*zeta, [t;x]);
 
-                    %Aw <= b
-%                     [consf0, coefff0] =  obj.make_psatz(d, Xall, Lv0+b'*zeta, [t;x]);
-                    [consf0, coefff0] =  obj.make_psatz(d, Xall, Lv0 -poly.alpha-z*b'*zeta, [t;x; z]);
+                    %Aw <= b + z
+                    %was bugged, used to be b.*z         
+                    [consf0, coefff0] =  obj.make_psatz(d, Xall, Lv0 -poly.alpha-(z+b)'*zeta, [t;x; z]);
 
                     %alpha: useful for time-independent uncertainty in
                     %finite time
@@ -321,7 +323,9 @@ classdef location_crash_interface < handle
             if (sol.problem == 0) || (sol.problem == 4)
                 fprintf('Recovering Solution\n')
                 %the sets X0 and X1 are disconnected in time range [0, T]
-                [out.poly, out.func] = obj.recover_poly(prog.poly);
+                if obj.opts.recover
+                    [out.poly, out.func] = obj.recover_poly(prog.poly);
+                end
                 out.sol = sol;   
                 out.block = struct;
                 out.block.monom = monom;

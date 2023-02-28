@@ -12,6 +12,8 @@ classdef loc_sos_options
         Tmax(1,1) double{mustBePositive}  = 5;   
         TIME_INDEP = 0; %formulation independent of time
         
+        recover = 1; %recover the solution polynomials
+        
         %% Variables and descriptors
         %variables defining sets (array of symbolic variables)
         
@@ -35,7 +37,7 @@ classdef loc_sos_options
         fw = {}; %elements are dynamics with each uncertainty
         
         %uncertainty set
-        poly = struct('A', [], 'b', [], 'G', []);
+        W = struct('A', [], 'b', [], 'G', []);
         
         %w | exists tau: Aw + Gtau <= b
         w = [];
