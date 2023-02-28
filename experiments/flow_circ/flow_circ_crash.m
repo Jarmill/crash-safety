@@ -118,8 +118,7 @@ Ru = 0.5;
 
     
     %INIT_POINT = 1
-    order = 4;
-% order=3; %  5.0660e-01
+    order = 4;% 6.2094e-01, taking 4979.66 seconds = 1.38 hours
 %     order = 2; %  4.6207e-01
 %     order = 1; %4.6166e-01
 
