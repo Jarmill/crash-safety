@@ -4,8 +4,8 @@
 
 PROBLEM = 1;
 SOLVE = 1;
-SAMPLE = 0;
-PLOT = 0;
+SAMPLE = 1;
+PLOT = 1;
 
 if PROBLEM
 rng(33, 'twister')
@@ -41,18 +41,16 @@ mlist = monolist(x, 3);
 model = struct('f0', [x(2);0], 'fw', [zeros(1, length(mlist)); mlist']);
 
 W = DG.data_cons(model, x, observed);
+W_true = W;
 W.b = W.b - epsilon(2);
+W.G = [];
 
 %TODO: write code to prune constraints/possibly trivial faces
 
 %modify W for the crash program
 % [model_cheb,W_cheb] = DG.center_cheb(model, W);
 % W_red = DG.reduce_constraints(W_cheb);
-W_red = W;
-
-% model = model_cheb;
-W = W_red;
-[w_handle, box]= DG.make_sampler(W);
+[w_handle, box]= DG.make_sampler(W_true);
 
 end
  
@@ -103,6 +101,7 @@ Ru = 0.5;
     lsupp.Tmax = Tmax;
     lsupp.W = W;
     lsupp.recover=0;
+    lsupp.solver='mosek';
 
     
     lsupp.recover=0;
@@ -118,8 +117,12 @@ Ru = 0.5;
 
     
     %INIT_POINT = 1
+    
     order = 4;% 6.2094e-01, taking 4979.66 seconds = 1.38 hours
-%     order=3; %  5.0660e-01
+    %but this violates the crash-bound from crash_flow_casadi_data_driven.
+    %why? Bad conditioning? Invalid solution?
+    %Gram0 has a condition number of 4.5327e+08 (if that matters)
+%     order=3; %  5.0660e-01 (slight infeasibility, gram eig = 4*10^-5. doesn't work on sdpa_gmp, too big
 %     order = 2; %  4.6207e-01
 %     order = 1; %4.6166e-01
 

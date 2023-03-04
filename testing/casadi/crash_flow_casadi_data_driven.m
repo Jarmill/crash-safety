@@ -4,7 +4,9 @@
 
 %based on https://web.casadi.org/blog/ocp/ race_car.m
 
-N = 300; % number of control intervals
+%crash bound 0.5499
+
+N = 400; % number of control intervals
 
 opti = casadi.Opti(); % Optimization problem
 
