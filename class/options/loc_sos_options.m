@@ -44,6 +44,10 @@ classdef loc_sos_options
         %scale time from [0, Tmax] to [0, 1]?
         scale = 1;
         
+        %moments of lebesgue distribution of X
+        %used for reachable set computation
+        mom_handle = [];
+        
     end
     
     methods

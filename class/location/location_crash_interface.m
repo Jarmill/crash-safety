@@ -379,11 +379,11 @@ classdef location_crash_interface < handle
             
             %remember to scale by time 
             
-            [cz, mz] = coefficients(poly_var.zeta,main_vars);
+            [czeta, mzeta] = coefficients(poly_var.zeta,main_vars);
             if n == 1
-                zeta_eval = value(cz)'*mz;
+                zeta_eval = value(czeta)'*mzeta;
             else
-                zeta_eval = value(cz)*mz;
+                zeta_eval = value(czeta)*mzeta;
             end                     
             
             %nonnegative evaluation

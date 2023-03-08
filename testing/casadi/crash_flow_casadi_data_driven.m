@@ -120,17 +120,19 @@ figure(1)
 clf
 hold on
 
+c = linspecer(3);
+
 scatter(C0(1), C0(2), 200, 'ok')
-plot(sol.value(X(1, :)), sol.value(X(2, :)))
+plot(sol.value(X(1, :)), sol.value(X(2, :)), 'color', c(1, :), 'linewidth', 3)
 
 theta_half_range = linspace(theta_c-pi/2, theta_c + pi/2, 200);
 circ_half = [cos(theta_half_range); sin(theta_half_range)];
 Xu = Cu + circ_half* Ru;
 patch(Xu(1, :), Xu(2, :), 'r', 'Linewidth', 3, 'EdgeColor', 'none', 'DisplayName', 'Unsafe Set')
 
-xlabel('x_1')
-ylabel('x_2')
-title('Min-time Crash states') 
+xlabel('$x_1$', 'interpreter', 'latex')
+ylabel('$x_2$', 'interpreter', 'latex')
+title(sprintf('Crash States (z=%0.4f)', sol.value(Z)), 'fontsize', 16) 
 pbaspect([diff(xlim), diff(ylim), 1])
 
 figure(2)
@@ -142,17 +144,17 @@ vtu = vt(1:end-1);
 plot(vtu, sol.value(U))
 % plot(xlim, sol.value(Z)*[1,1], 'k')
 % plot(xlim, -sol.value(Z)*[1,1], 'k')
-xlabel('t')
-ylabel('u(t)')
-title('Data-Driven Crash Control-effort') 
+xlabel('$t$', 'interpreter', 'latex')
+ylabel('$u(t)$', 'interpreter', 'latex')
+title('Data-Driven Crash Control-effort', 'Fontsize', 14) 
 
 figure(3)
 clf
 hold
 plot(vt, sol.value(X))
-xlabel('t')
-ylabel('x(t)')
-title('Data-Driven Crash State') 
+xlabel('$t$', 'interpreter', 'latex')
+ylabel('$x(t)$', 'interpreter', 'latex')
+title('Data-Driven Crash State', 'Fontsize', 14) 
 
 
 figure(4)
@@ -161,6 +163,6 @@ hold
 plot(vtu, W.A*sol.value(U) - W.b)
 plot(xlim, sol.value(Z)*[1,1], 'k')
 plot(xlim, -sol.value(Z)*[1,1], 'k')
-xlabel('t')
-ylabel('Aw(t)-b')
-title('Data-Driven Crash Control-Constraints') 
+xlabel('$t$', 'interpreter', 'latex')
+ylabel('$\Gamma w(t)-h$', 'interpreter', 'latex')
+title('Data-Driven Crash Control-Constraints', 'Fontsize', 14) 
