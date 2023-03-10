@@ -104,20 +104,24 @@ Ru = 0.5;
     
     %INIT_POINT = 1
     
-    order=4;
-%     order=3;
-%     order=2;
-%     order=1;
+    %order 5: primal infeasible. need to upper-bound the subvalue objective
+    %to Zmax*vol(X)?
+%     order=4;  %integral 6.8390e+00, C0 value = 0.3189
+%     order=3; %integral 3.0785e+00, C0 value = 0.1474
+%     order=2; %integral 5.0501e-07, C0 value = 1.5756e-08
+%     order=1; %integral 3.4185e-08, C0 value =   1.6543e-09
 
 
 
     d = 2*order; 
 
-    % [prog]= PM.make_program(d);
-    % out = PM.solve_program(prog)
-    out = PM.run(order);
-    disp(sprintf('crash cost: %0.4e', out.obj))
     
+    out = PM.run(order);
+    disp(sprintf('subvalue integral: %0.4e', out.obj))
+    
+    load('subvalue_flow_circ_simple.mat', 'flow_func');
+    flow_func{order} = out.func;
+    save('subvalue_flow_circ_simple.mat', 'flow_func');
 end
 
 %% plot the subvalue function
@@ -125,7 +129,7 @@ if PLOT_SUBVALUE
     figure(40)
     clf
     hold on
-    fsurf(@(x, y) out.func.q([x; y]), [-1, 1, -1, 1]*box_lim);
+    fsurf(@(x, y) flow_func{4}.q([x; y]), [-1, 1, -1, 1]*box_lim);
     
     %draw the unsafe set
     theta_half_range = linspace(theta_c-pi/2, theta_c + pi/2, 200);

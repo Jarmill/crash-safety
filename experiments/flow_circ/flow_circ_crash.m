@@ -4,8 +4,8 @@
 
 PROBLEM = 1;
 SOLVE = 1;
-SAMPLE = 1;
-PLOT = 1;
+SAMPLE = 0;
+PLOT = 0;
 
 if PROBLEM
 rng(33, 'twister')
@@ -118,14 +118,19 @@ Ru = 0.5;
     
     %INIT_POINT = 1
     
-    order = 4;% 6.2094e-01, taking 4979.66 seconds = 1.38 hours
+    %BAD BOUNDS:
+%     order = 4;% 6.2094e-01, taking 4979.66 seconds = 1.38 hours
     %but this violates the crash-bound from crash_flow_casadi_data_driven.
-    %why? Bad conditioning? Invalid solution?
+    %why? Bad conditioning? Invalid solution? BECAUSE MY CODE WAS BUGGED!
     %Gram0 has a condition number of 4.5327e+08 (if that matters)
 %     order=3; %  5.0660e-01 (slight infeasibility, gram eig = 4*10^-5. doesn't work on sdpa_gmp, too big
 %     order = 2; %  4.6207e-01
 %     order = 1; %4.6166e-01
 
+    %GOOD BOUNDS
+order=3;
+    %     order=2; %4.4231e-01
+%     order=1; %5.8215e-02
 
 
     d = 2*order; 
