@@ -70,10 +70,14 @@ classdef location_crash_interface < handle
 
             %every application includes an initial set valuation of v
             v0 = replace(v, t, 0);
-            if obj.opts.scale
-                vT = replace(v, t, 1);
+            if obj.opts.FREE_TERMINAL
+                    vT = v;
             else
-                vT = replace(v, t, obj.opts.Tmax);
+                if obj.opts.scale
+                    vT = replace(v, t, 1);
+                else
+                    vT = replace(v, t, obj.opts.Tmax);
+                end
             end
             
             %The higher programs may create other variables
@@ -251,7 +255,7 @@ classdef location_crash_interface < handle
                     %output
                     coeff_lie = coefff0;
                     cons_lie = consf0:'Lie base duality';
-                    nonneg_lie = Lv0 - poly.alpha- b'*zeta;
+                    nonneg_lie = Lv0 - poly.alpha- (z+b)'*zeta;
                 end
                 %terms with uncertainty
                 %these are equality constraints in polynomial coefficients
@@ -501,14 +505,17 @@ classdef location_crash_interface < handle
             %peak estimation is over all time
             Xterm = obj.opts.get_X_term();
             
-
+            term_vars = [poly.x; poly.z];
+            if obj.opts.FREE_TERMINAL
+                term_vars = [poly.t; term_vars];
+            end
             
             coeff = [];
             con = [];
 
             term_pos = poly.z - poly.vT;
             
-            [con_term, coeff_term] = obj.make_psatz(d, Xterm, term_pos, [poly.x; poly.z]);
+            [con_term, coeff_term] = obj.make_psatz(d, Xterm, term_pos, term_vars);
             
             coeff = [coeff_term];
             con = [con_term:'Terminal'];

@@ -11,7 +11,7 @@ classdef loc_sos_options
         %terminal time   
         Tmax(1,1) double{mustBePositive}  = 5;   
         TIME_INDEP = 0; %formulation independent of time
-        
+        FREE_TERMINAL = 1;
         recover = 1; %recover the solution polynomials
         
         %% Variables and descriptors

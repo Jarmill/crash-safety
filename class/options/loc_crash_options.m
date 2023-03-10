@@ -40,6 +40,12 @@ classdef loc_crash_options < loc_sos_options
                 Xsupp = obj.X;
             end
             Xsupp.ineq = [Xsupp.ineq; obj.get_Z()];
+            
+            
+            if obj.FREE_TERMINAL
+                Tsupp = obj.get_t_supp();
+                Xsupp.ineq = [Tsupp.ineq; Xsupp.ineq];
+            end
         end
         
         function Z = get_Z(obj)
