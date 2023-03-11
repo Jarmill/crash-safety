@@ -112,6 +112,8 @@ C0 = [1; 0];
 
     objective = [c1f; c2f];
     
+    lsupp.Zmax_Cap = lsupp.Zmax*4;
+    
     %% start up tester
     PM = crash_subvalue_sos(lsupp);
 
@@ -120,20 +122,30 @@ C0 = [1; 0];
     
     %INIT_POINT = 1
     
+    
+    %v capped at 4*Zmax
+    order=1; %crash integral: 2.1926e-01, C0: 6.1801e-03
+    order=2; %integral: 3.8079e+00, C0: 1.8204e-01
+    order=3; %integral: 8.1154e+00, C0: 3.3272e-01
+    order=4;
+%     order
+    
+    %v uncapped
+    
 %int q(x) dx = 11.6027, almost entirely constant q=0.461655113926 (WAS A
 %BUG!)
 %true cost at C0:  0.54999
 %     order = 1; %integral: 2.1926e-01, C0: 0.006180037245630
 %     order = 2; %integral: 3.8185e+00, C0:  0.1829
 %     order=3; %integral: 7.8326e+00, C0: 0.3399
-  order=4; %integral: 1.85945e+01, C0: -19.0122
+%   order=4; %integral: 1.85945e+01, C0: -19.0122
 
     d = 2*order; 
 
     % [prog]= PM.make_program(d);
     % out = PM.solve_program(prog)
     out = PM.run(order);
-    disp(sprintf('crash integral: %0.4e', out.obj))
+    fprintf('integral: %0.4e, C0: %0.4e', out.obj, out.func.q([1; 0]));
     
     
     load('subvalue_flow_circ.mat', 'flow_func');
