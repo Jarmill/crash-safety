@@ -29,7 +29,7 @@ classdef crash_subvalue_sos < location_crash_interface
             
         end
         
-        %% constraints
+        %% constraints      
         
         function [coeff, con, nonneg] = make_init_con(obj, d, poly)
             %Constraint on initial measure
@@ -55,21 +55,34 @@ classdef crash_subvalue_sos < location_crash_interface
                 end
                 
                 [con_curr, coeff_curr] = obj.make_psatz(d, XZ_curr, v0_curr - poly.q, var_curr);
+                
+                if obj.opts.Zmax_Cap
+                    [con_cap, coeff_cap] = obj.make_psatz(d, X0{i}, obj.opts.Zmax_Cap - poly.q, poly.x);
+                end
 %                 X0_curr = [X0{i}; obj.opts.get_Z];
 %                 
                 
                 if length(X0) == 1
                     init_tag = 'initial';
+                    cap_tag = 'zmax cap';
                 else
                     init_tag = ['initial ', num2str(i)];
+                    cap_tag = ['zmax cap ', num2str(i)];
                 end
                 
                 coeff = [coeff; coeff_curr];
                 con   = [con; con_curr:init_tag];
+                
+                if obj.opts.Zmax_Cap
+                    coeff = [coeff;coeff_cap];
+                    con   = [con; con_cap: cap_tag];
+                end
 %                 nonneg = [nonneg; init_pos];
 
                 %the nonnegative function should hold for all time
                 nonneg = [nonneg; poly.v-poly.q];
+                
+                
             end
             
         end

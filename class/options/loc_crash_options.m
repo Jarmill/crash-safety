@@ -6,6 +6,7 @@ classdef loc_crash_options < loc_sos_options
         %minimizing control.
         Zmax = 1;
         z = [];
+        Zmax_Cap = 0; %used for subvalue only, whether to place an upper bound on the subvalue function
     end
     
     methods

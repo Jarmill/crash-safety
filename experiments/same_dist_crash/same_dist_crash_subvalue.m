@@ -99,6 +99,9 @@ Ru = 0.5;
 
     objective = [c1f; c2f];
     
+    %cap the maximal corruption
+    lsupp.Zmax_Cap = 2*lsupp.Zmax;
+    
     %% start up tester
     PM = crash_subvalue_sos(lsupp);
 
@@ -106,12 +109,23 @@ Ru = 0.5;
     %INIT_POINT = 1
     
 
+    %uncapped zmax
 %     order=1; %integral 1.0424e-07,  X01 eval: 3.9574e-09, X02 eval: 6.5930e-09 
 %     order =2;  integral: 3.1026e-07, X01 eval: -6.4925e-09, X02 eval: -5.2559e-09 
 %     order=3; %subvalue integral: 1.7682e+00, X01 eval: -1.0750e-01, X02 eval: -5.2519e-02 
 %     order=4; %subvalue integral: 4.2754e+00,  X01 eval: -8.6549e-02, X02 eval: -6.9769e-02 
-    order=5;
+%     order=5; %subvalue integral: 1.6117e+01, X01 eval: -3.1276e+00, X02 eval: -2.2413e+00 
     
+    
+    %q <= zmax capped
+%     order=1; %subvalue integral: 2.1520e-07, X01 eval: 1.0227e-08,  X02 eval: 1.3250e-08 
+%     order=2; %subvalue integral: 2.9289e-07, X01 eval: -6.6228e-10,  X02 eval: 7.5942e-10 
+%     order=3; %subvalue integral: 1.7666e+00, X01 eval: -1.0849e-01,  X02 eval: -5.2615e-02 
+%     order=4; %subvalue integral: 3.6487e+00, X01 eval: -9.3258e-02,  X02 eval: -6.9378e-02 
+%     order=5; %subvalue integral: 4.9304e+00, X01 eval: -3.1628e-02,  X02 eval: -4.6078e-02
+
+%q <= 2*zmax
+order=3;
 
 
     d = 2*order; 
@@ -121,7 +135,7 @@ Ru = 0.5;
     X01 = [0.395; 1.21];
     X02 = [1.279; -1.21];
 
-    fprintf('subvalue integral: %0.4e \n X01 eval: %0.4e \n X02 eval: %0.4e \n', ...
+    fprintf('subvalue integral: %0.4e, X01 eval: %0.4e,  X02 eval: %0.4e \n', ...
         out.obj, out.func.q(X01), out.func.q(X02))
     
     load('subvalue_same_dist.mat', 'flow_func');
