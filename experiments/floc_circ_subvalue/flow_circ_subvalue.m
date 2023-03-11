@@ -2,8 +2,8 @@
 
 %break up the sections here into functions
 
-PROBLEM = 0;
-SOLVE = 0;
+PROBLEM = 1;
+SOLVE = 1;
 SAMPLE = 0;
 PLOT = 1;
 
@@ -99,17 +99,12 @@ C0 = [1; 0];
     lsupp.f0 = model.f0;
     lsupp.fw = model.fw;
     lsupp.Tmax = Tmax;
-    lsupp.W = W;
-    lsupp.recover=0;
+    lsupp.W = W;    
     lsupp.solver='mosek';
     
 %     box_supp = box_process(2, box_lim);
 %     lsupp.mom_handle = @(d) LebesgueBoxMom(d, box_supp', 1);
     lsupp.mom_handle = @(d) get_leb_sphere(d, n, sqrt(2)*box_lim);
-
-
-    
-    lsupp.recover=1;
     
     lsupp.verbose = 1;
 
@@ -121,19 +116,29 @@ C0 = [1; 0];
     PM = crash_subvalue_sos(lsupp);
 
     
+    flow_func = cell(4, 1);
+    
     %INIT_POINT = 1
     
-
-%     order = 1; %int q(x) dx = 11.6027, almost entirely constant q=0.461655113926
-%     order = 2; %same as order 1
-    order=3; % 
+%int q(x) dx = 11.6027, almost entirely constant q=0.461655113926 (WAS A
+%BUG!)
+%true cost at C0:  0.54999
+%     order = 1; %integral: 2.1926e-01, C0: 0.006180037245630
+%     order = 2; %integral: 3.8185e+00, C0:  0.1829
+    order=3; %integral: 7.8326e+00, C0: 0.3399
+%   order=4; %integral: , C0: 
 
     d = 2*order; 
 
     % [prog]= PM.make_program(d);
     % out = PM.solve_program(prog)
     out = PM.run(order);
-    disp(sprintf('crash subvalue: %0.4e', out.obj))
+    disp(sprintf('crash integral: %0.4e', out.obj))
+    
+    
+    load('subvalue_flow_circ.mat', 'flow_func');
+    flow_func{order} = out.func;
+    save('subvalue_flow_circ.mat', 'flow_func');
     
 end
 
