@@ -125,8 +125,8 @@ C0 = [1; 0];
 %true cost at C0:  0.54999
 %     order = 1; %integral: 2.1926e-01, C0: 0.006180037245630
 %     order = 2; %integral: 3.8185e+00, C0:  0.1829
-    order=3; %integral: 7.8326e+00, C0: 0.3399
-%   order=4; %integral: , C0: 
+%     order=3; %integral: 7.8326e+00, C0: 0.3399
+  order=4; %integral: 1.85945e+01, C0: -19.0122
 
     d = 2*order; 
 

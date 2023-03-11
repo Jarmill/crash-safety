@@ -12,6 +12,7 @@ Xu = Cu + circ_half* Ru;
 patch(Xu(1, :), Xu(2, :), ones(size(Xu(1, :))), 'r', 'Linewidth', 3, 'EdgeColor', 'none')
 C0 = [1; 0];
 scatter3(C0(1), C0(2), 1, 100, 'k', 'filled')
+c_c0 = subvalue_eval(C0(1), C0(2), flow_func)
 
 xlabel('$x_1$', 'interpreter', 'latex')
 ylabel('$x_2$', 'interpreter', 'latex')
