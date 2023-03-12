@@ -9,6 +9,7 @@ PLOT = 1;
 
 if PROBLEM
 rng(33, 'twister')
+yalmip('clear')
 %% generate samples
 % A_true = [-1 1; -1 -0.3];
 f_true = @(t, x) [x(2); -x(1) + (1/3).* x(1).^3 - x(2)];
@@ -112,7 +113,7 @@ C0 = [1; 0];
 
     objective = [c1f; c2f];
     
-    lsupp.Zmax_Cap = lsupp.Zmax*4;
+    lsupp.Zmax_Cap = lsupp.Zmax*1.5;
     
     %% start up tester
     PM = crash_subvalue_sos(lsupp);
@@ -124,11 +125,17 @@ C0 = [1; 0];
     
     
     %v capped at 4*Zmax
-    order=1; %crash integral: 2.1926e-01, C0: 6.1801e-03
-    order=2; %integral: 3.8079e+00, C0: 1.8204e-01
-    order=3; %integral: 8.1154e+00, C0: 3.3272e-01
-    order=4;
-%     order
+%     order=1; %crash integral: 2.1926e-01, C0: 6.1801e-03
+%     order=2; %integral: 3.8079e+00, C0: 1.8204e-01
+%     order=3; %integral: 8.1154e+00, C0: 3.3272e-01
+%     order=4; %integral: 2.5884e+01, C0: -2.8276e-01, time 6583.91 sec = 109 min
+
+    %v capped at 1.5*Zmax
+%     order=1; integral: 2.1926e-01, C0: 6.1800e-03
+%      order = 2; %integral: 3.8071e+00, C0: 1.8196e-01
+    order=3; %integral: 7.6824e+00, C0: 3.4372e-01
+    
+
     
     %v uncapped
     
@@ -144,13 +151,14 @@ C0 = [1; 0];
 
     % [prog]= PM.make_program(d);
     % out = PM.solve_program(prog)
+    
     out = PM.run(order);
     fprintf('integral: %0.4e, C0: %0.4e', out.obj, out.func.q([1; 0]));
     
     
-    load('subvalue_flow_circ.mat', 'flow_func');
+    load('subvalue_flow_circ_1_half.mat', 'flow_func');
     flow_func{order} = out.func;
-    save('subvalue_flow_circ.mat', 'flow_func');
+    save('subvalue_flow_circ_1_half.mat', 'flow_func');
     
 end
 
@@ -189,7 +197,13 @@ figure(55)
 clf
 fsurf(@(x, y) out.func.q([x; y]), [-box_lim, box_lim, -box_lim, box_lim]);
     
-    
+    %draw the unsafe set
+theta_half_range = linspace(theta_c-pi/2, theta_c + pi/2, 200);
+circ_half = [cos(theta_half_range); sin(theta_half_range)];
+Xu = Cu + circ_half* Ru;
+% patch(Xu(1, :), Xu(2, :), ones(size(Xu(1, :))), 'r', 'Linewidth', 3, 'EdgeColor', 'none')
+patch(Xu(1, :), Xu(2, :), zeros(size(Xu(1, :))), 'r', 'Linewidth', 3, 'EdgeColor', 'none')
+C0 = [1; 0];
 %     PS = peak_sos_plotter(out, out_sim);
 
 %     DG.data_plot_2(observed);
