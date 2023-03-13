@@ -30,6 +30,7 @@ sample = struct('t', Tmax, 'x', @() box_lim*(2*rand(2,1)-1));
 
 
 %% generate model
+yalmip('clear')
 t = sdpvar(1, 1);
 x = sdpvar(2, 1);
 
@@ -58,10 +59,11 @@ if SOLVE
 
 %     C0 = [1.5; 0];
 % %     C0 = [-1; 0];
-    R0 = 0.2;
+%     R0 = 0.2;
 C0 = [1; 0];
-% R0 = 0.4;
-    INIT_POINT = 1;
+R0 = 0.4;
+
+    INIT_POINT = 0;
     if INIT_POINT
         X0 = C0;
     else
@@ -120,13 +122,18 @@ Ru = 0.5;
 
     
     %INIT_POINT = 1
- 
- order=5; %    5.1179e-01
+%  order=5; %    5.1179e-01
 %    order=4; %5.0918e-01
  %  order=3;%4.3694e-01\
 %  order=2; % 1.1843e-01
 %     order=1;%1.1166e-07
 
+%INIT_POINT = 0; casadi crash bound
+order=1; %crash cost: 8.1010e-08
+order=2; %crash cost: 6.5897e-02
+% order=3; crash cost: 4.0539e-01
+order=4; %crash cost: 4.6316e-01, time: 36.81
+% order=5; %crash cost: 4.6381e-01, time: 868.81
 
     d = 2*order; 
 

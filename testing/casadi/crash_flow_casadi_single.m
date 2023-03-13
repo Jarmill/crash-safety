@@ -44,8 +44,24 @@ opti.minimize(Z);
 Zmax = 1;
 Tmax = 5;
 %initial point
+
+INIT_POINT = 1;
+
+
+    R0 = 0.4;
 C0 = [1; 0];
-opti.subject_to(X(1:2, 1) == C0);   % start at initial point
+% R0 = 0.4;
+    INIT_POINT = 0;
+    if INIT_POINT
+%         crash bound=0.5124
+        opti.subject_to(X(1:2, 1) == C0);   % start at initial point
+    else
+        %         crash bound=0.4880, R0 = 0.2
+        %         crash bound=0.4639, R0 = 0.4;
+        opti.subject_to(R0^2 - sum((X(1:2, 1)-C0).^2) >= 0);
+    end
+    
+
 % opti.subject_to(X (3, 1) == Zmax);
 
 
