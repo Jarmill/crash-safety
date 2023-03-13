@@ -122,7 +122,8 @@ hold on
 
 c = linspecer(3);
 
-scatter(C0(1), C0(2), 200, 'ok')
+% scatter(C0(1), C0(2), 200, 'ok')
+scatter(sol.value(X(1, 1)), sol.value(X(2, 1)), 100, c(1, :), 'filled')
 plot(sol.value(X(1, :)), sol.value(X(2, :)), 'color', c(1, :), 'linewidth', 3)
 
 theta_half_range = linspace(theta_c-pi/2, theta_c + pi/2, 200);

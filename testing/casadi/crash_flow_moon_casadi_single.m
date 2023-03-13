@@ -4,7 +4,7 @@
 
 %based on https://web.casadi.org/blog/ocp/ race_car.m
 
-N = 200; % number of control intervals
+N = 400; % number of control intervals
 
 opti = casadi.Opti(); % Optimization problem
 
@@ -116,7 +116,8 @@ figure(1)
 clf
 hold on
 
-scatter(C0(1), C0(2), 200, 'ok')
+% scatter(C0(1), C0(2), 200, 'ok')
+scatter(sol.value(X(1, 1)), sol.value(X(2, 1)), 100, c(1, :), 'filled')
 c = linspecer(3)
 plot(sol.value(X(1, :)), sol.value(X(2, :)), 'color', c(1, :), 'linewidth', 2)
 % plot(sol.value(X(1, :)), sol.value(X(2, :)))

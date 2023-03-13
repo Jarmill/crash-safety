@@ -4,7 +4,7 @@
 
 %based on https://web.casadi.org/blog/ocp/ race_car.m
 
-N = 100; % number of control intervals
+N = 400; % number of control intervals
 
 opti = casadi.Opti(); % Optimization problem
 
@@ -102,7 +102,13 @@ figure(1)
 clf
 hold on
 
-scatter(C0(1), C0(2), 200, 'ok')
+if ~INIT_POINT
+%     scatter(C0(1), C0(2), 200, 'ok')
+% else
+    th = linspace(0, 2*pi, 200);
+    plot(cos(th)*R0 + C0(1), sin(th)*R0 + C0(2), 'k')    
+end
+scatter(sol.value(X(1, 1)), sol.value(X(2, 1)), 100, c(1, :), 'filled')
 c = linspecer(3);
 plot(sol.value(X(1, :)), sol.value(X(2, :)), 'color', c(1, :), 'linewidth', 2)
 
@@ -111,9 +117,9 @@ circ_half = [cos(theta_half_range); sin(theta_half_range)];
 Xu = Cu + circ_half* Ru;
 patch(Xu(1, :), Xu(2, :), 'r', 'Linewidth', 3, 'EdgeColor', 'none', 'DisplayName', 'Unsafe Set')
 
-xlabel('x_1')
-ylabel('x_2')
-title('Crash states') 
+xlabel('$x_1$', 'interpreter', 'latex')
+ylabel('$x_2$', 'interpreter', 'latex')
+title(sprintf('Crash States (z=%0.4f)', sol.value(Z)), 'fontsize', 16)  
 pbaspect([diff(xlim), diff(ylim), 1])
 
 figure(2)
