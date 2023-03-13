@@ -24,7 +24,7 @@ cb.Label.String='crash lower bound';
 function c = subvalue_eval(x, y, flow_func)
     c = zeros(size(x));
     
-    for i = 1:4
+    for i = 1:length(flow_func)
         c = max(c, flow_func{i}.q([x; y]));
     end
     c = min(c, ones(size(c)));

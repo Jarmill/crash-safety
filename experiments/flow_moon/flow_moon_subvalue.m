@@ -60,21 +60,47 @@ if SOLVE
 
     
     %unsafe set
-    
-%     Ru = 0.3;
-%     Cu = [0; -0.5];
-Cu = [-0.25; -0.7];
-Ru = 0.5;
-    c1f = Ru^2 - sum((x-Cu).^2);
-%     c2f = -diff(x-Cu);
+        %unsafe set
+    %moon heights
+    h_in = 0.4;
+h_out = 1;
 
-    theta_c = 5*pi/4;
-    w_c = [cos(theta_c); sin(theta_c)];
-    c2f = w_c(1)*(x(1) - Cu(1)) + w_c(2) * (x(2) - Cu(2)); 
+    
 
-    Xu = struct('ineq', [c1f; c2f], 'eq', []);
+%hugging the curve
+moon_center = [0.4;-0.4];
+moon_theta = -pi/10;
+moon_scale = 0.8;
+
+%same coordinates as half-circle example
+% moon_center = [0;-0.7];
+% moon_theta = -pi/4;
+% moon_scale = 0.5
+
+moon_rot = [cos(moon_theta), sin(-moon_theta); sin(moon_theta), cos(moon_theta)];
+% x_moon_move = moon_rot*x_moon*moon_scale + moon_center;
+
+
+%statistics of the moon
+c_in = [0;0.5*(1/h_in - h_in)];
+r_in = 0.5*(1/h_in + h_in);
+
+c_out = [0;0.5*(1/h_out - h_out)];
+r_out = 0.5*(1/h_out + h_out);
+
+c_in_scale = moon_rot*c_in*moon_scale + moon_center;
+c_out_scale = moon_rot*c_out*moon_scale + moon_center;
+
+r_in_scale = moon_scale*r_in;
+r_out_scale = moon_scale*r_out;
+
+%constraints of the moon
+con_inner =  sum((x-c_in_scale).^2) - r_in_scale^2;
+con_outer =  -sum((x-c_out_scale).^2) + r_out_scale^2;
+Xu = struct('ineq', [con_inner; con_outer], 'eq', []);
     
     
+    %location support
     lsupp = loc_crash_options();
     lsupp.t = t;
     lsupp.TIME_INDEP = 0;
@@ -88,7 +114,7 @@ Ru = 0.5;
     lsupp.W = W;
 %     lsupp.recover=1;
     lsupp.solver='mosek';
-    lsupp.Zmax_Cap = 4;
+    lsupp.Zmax_Cap = 2;
 
     box = [-1, -1; 1, 1]*box_lim;
     lsupp.mom_handle = @(d) LebesgueBoxMom( d, box, 1);
@@ -96,8 +122,7 @@ Ru = 0.5;
     lsupp.verbose = 1;
 
 %     objective = x(1);
-
-    objective = [c1f; c2f];
+   
     
     %% start up tester
     PM = crash_subvalue_sos(lsupp);
@@ -107,30 +132,31 @@ Ru = 0.5;
     
     %order 5: primal infeasible. need to upper-bound the subvalue objective
     %to Zmax*vol(X)?
-%     order=4;  %integral 6.8390e+00, C0 value = 0.3189
-%     order=3; %integral 3.0785e+00, C0 value = 0.1474
-%     order=2; %integral 5.0501e-07, C0 value = 1.5756e-08
-%     order=1; %integral 3.4185e-08, C0 value =   1.6543e-09
 
 
     %ZMax cap of 4:
+%     order=1; %integral: 1.9777e-07, C0: 8.8079e-09
+%     order=2;%integral: 1.4745e-07, C0: 6.8638e-10
+%     order=3; %integral: 1.1393e+00, C0: -8.8452e-02
+        order=4; %integral: 3.7723e+00, C0: -6.4243e-03
+
+        %Zmax cap = 2
+%     order=1; %integral: 1.3425e-07, C0: 4.6520e-10
+%     order=2;%integral: 1.3425e-07, C0: 4.6520e-10
+%     order=3; %integral: 1.0268e+00, C0: -7.8612e-02
+%     order=4; %integral: 3.1875e+00, C0: -5.6924e-03
     order=5;
-    %8.2598e+00, C0: 4.0531e-01, time: 1268.52  sec
-%         order=4;  %integral: 5.9922e+00, C0: 3.3916e-01
-%     order=3; %integral: 3.0794e+00, C0: 1.4734e-01
-%     order=2; %integral: 4.8643e-07, C0: 1.6070e-08
-%     order=1; %integral: 1.9338e-07, C0: 1.0887e-08
 
-
+        
     d = 2*order; 
 
     
     out = PM.run(order);
     disp(sprintf('integral: %0.4e, C0: %0.4e', out.obj, out.func.q([1; 0])))
     
-    load('subvalue_flow_circ_simple_4.mat', 'flow_func');
+    load('subvalue_flow_moon_simple_2.mat', 'flow_func');
     flow_func{order} = out.func;
-    save('subvalue_flow_circ_simple_4.mat', 'flow_func');
+    save('subvalue_flow_moon_simple_2.mat', 'flow_func');
 end
 
 %% plot the subvalue function
@@ -140,12 +166,16 @@ if PLOT_SUBVALUE
     hold on
     fsurf(@(x, y) flow_func{order}.q([x; y]), [-1, 1, -1, 1]*box_lim);
     
-    %draw the unsafe set
-    theta_half_range = linspace(theta_c-pi/2, theta_c + pi/2, 200);
-    circ_half = [cos(theta_half_range); sin(theta_half_range)];
-    Xu = Cu + circ_half* Ru;
-    patch(Xu(1, :), Xu(2, :), 'r', 'Linewidth', 3, 'EdgeColor', 'none')
-    
+    %draw the moon
+x_moon = moon_base(h_in, h_out);
+moon_rot = [cos(moon_theta), sin(-moon_theta); sin(moon_theta), cos(moon_theta)];
+Xu = moon_rot*x_moon*moon_scale + moon_center;
+ 
+
+% Xu = Cu + circ_half* Ru;
+patch(Xu(1, :), Xu(2, :), 'r', 'Linewidth', 3, 'EdgeColor', 'none', 'DisplayName', 'Unsafe Set')
+
+
 end
 
 %% Sample trajectories

@@ -121,10 +121,10 @@ Ru = 0.5;
     
     %INIT_POINT = 1
  
-%  order=5; %    
+ order=5; %    5.1179e-01
 %    order=4; %5.0918e-01
  %  order=3;%4.3694e-01\
- order=2; % 1.1843e-01
+%  order=2; % 1.1843e-01
 %     order=1;%1.1166e-07
 
 

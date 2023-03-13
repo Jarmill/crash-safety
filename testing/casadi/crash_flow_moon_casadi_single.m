@@ -4,7 +4,7 @@
 
 %based on https://web.casadi.org/blog/ocp/ race_car.m
 
-N = 100; % number of control intervals
+N = 200; % number of control intervals
 
 opti = casadi.Opti(); % Optimization problem
 
@@ -44,24 +44,54 @@ opti.minimize(Z);
 Zmax = 1;
 Tmax = 5;
 %initial point
-C0 = [1; 0];
+% C0 = [1.5; 1]; %cool 0.
+% C0 = [1.25; 1];
+% C0 = [-1; 0]; 
+% C0 = [0; 0]; %0.3232
+C0 = [1; 0]; %0.2240
+% C0 = [0.5; 0];
+% C0 = [0.4;-0.4]; %the coolest, has a twist, which means its a local min
 opti.subject_to(X(1:2, 1) == C0);   % start at initial point
 % opti.subject_to(X (3, 1) == Zmax);
 
+    %moon heights
+    h_in = 0.4;
+h_out = 1;
 
-% Cu = [1; -0.5];
-Cu = [-0.25; -0.7];
-Ru = 0.5;
+    
 
+%hugging the curve
+moon_center = [0.4;-0.4];
+moon_theta = -pi/10;
+moon_scale = 0.8;
+
+%same coordinates as half-circle example
+% moon_center = [0;-0.7];
+% moon_theta = -pi/4;
+% moon_scale = 0.5
+
+moon_rot = [cos(moon_theta), sin(-moon_theta); sin(moon_theta), cos(moon_theta)];
+% x_moon_move = moon_rot*x_moon*moon_scale + moon_center;
+
+
+%statistics of the moon
+c_in = [0;0.5*(1/h_in - h_in)];
+r_in = 0.5*(1/h_in + h_in);
+
+c_out = [0;0.5*(1/h_out - h_out)];
+r_out = 0.5*(1/h_out + h_out);
+
+c_in_scale = moon_rot*c_in*moon_scale + moon_center;
+c_out_scale = moon_rot*c_out*moon_scale + moon_center;
+
+r_in_scale = moon_scale*r_in;
+r_out_scale = moon_scale*r_out;
+
+%constraints of the moon
+con_inner =  @(x) sum((x-c_in_scale).^2) - r_in_scale^2;
+con_outer = @(x) -sum((x-c_out_scale).^2) + r_out_scale^2;
 %unsafe set 
-
-c1f=@(x) Ru^2 - (x(1) - Cu(1)).^2 - (x(2) - Cu(2)).^2;
-
-theta_c = 5*pi/4;
-w_c = [cos(theta_c); sin(theta_c)];
-c2f =@(x) w_c(1)*(x(1) - Cu(1)) + w_c(2) * (x(2) - Cu(2)); 
-
-Xu_con = @(x) [c1f(x); c2f(x)];
+Xu_con = @(x) [con_inner(x); con_outer(x)];
 opti.subject_to(Xu_con(X(:, N+1)) >= 0);
 
 %terminal time
@@ -78,7 +108,7 @@ opti.set_initial(T, 1);
 opti.solver('ipopt'); % set numerical backend
 sol = opti.solve();   % actual solve
 
-fprintf('crash bound=%0.4f', sol.value(Z))
+fprintf('crash bound=%0.4f\n', sol.value(Z))
 
 %% ---- plotting --------
 
@@ -91,7 +121,15 @@ plot(sol.value(X(1, :)), sol.value(X(2, :)))
 
 theta_half_range = linspace(theta_c-pi/2, theta_c + pi/2, 200);
 circ_half = [cos(theta_half_range); sin(theta_half_range)];
-Xu = Cu + circ_half* Ru;
+
+
+%draw the moon
+x_moon = moon_base(h_in, h_out);
+moon_rot = [cos(moon_theta), sin(-moon_theta); sin(moon_theta), cos(moon_theta)];
+Xu = moon_rot*x_moon*moon_scale + moon_center;
+ 
+
+% Xu = Cu + circ_half* Ru;
 patch(Xu(1, :), Xu(2, :), 'r', 'Linewidth', 3, 'EdgeColor', 'none', 'DisplayName', 'Unsafe Set')
 
 xlabel('x_1')
