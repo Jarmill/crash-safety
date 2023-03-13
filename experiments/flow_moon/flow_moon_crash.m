@@ -138,11 +138,11 @@ Xu = struct('ineq', [con_inner; con_outer], 'eq', []);
 
 
     %C0 = [0; 0], casadi bound 0.3232
-    order = 1; %crash cost: 2.7227e-08
-    order=2; %crash cost: 1.0103e-01
-    order=3; %crash cost: 2.9119e-01    
-    order=4; %crash cost: 3.2158e-01
-%     order=5;
+%     order = 1; %crash cost: 2.7227e-08
+%     order=2; %crash cost: 1.0103e-01
+%     order=3; %crash cost: 2.9119e-01    
+%     order=4; %crash cost: 3.2158e-01
+    order=5; %crash cost: 3.2242e-01
 
     d = 2*order; 
     

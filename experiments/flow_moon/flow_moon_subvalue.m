@@ -141,11 +141,11 @@ Xu = struct('ineq', [con_inner; con_outer], 'eq', []);
         order=4; %integral: 3.7723e+00, C0: -6.4243e-03
 
         %Zmax cap = 2
-%     order=1; %integral: 1.3425e-07, C0: 4.6520e-10
+    order=1; %integral: 1.9673e-07, C0: 8.7699e-09
 %     order=2;%integral: 1.3425e-07, C0: 4.6520e-10
 %     order=3; %integral: 1.0268e+00, C0: -7.8612e-02
 %     order=4; %integral: 3.1875e+00, C0: -5.6924e-03
-    order=5;
+%     order=5; %integral: 4.5018e+00, C0: 7.7213e-02
 
         
     d = 2*order; 

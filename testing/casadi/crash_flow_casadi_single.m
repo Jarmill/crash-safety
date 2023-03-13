@@ -87,7 +87,8 @@ clf
 hold on
 
 scatter(C0(1), C0(2), 200, 'ok')
-plot(sol.value(X(1, :)), sol.value(X(2, :)))
+c = linspecer(3);
+plot(sol.value(X(1, :)), sol.value(X(2, :)), 'color', c(1, :), 'linewidth', 2)
 
 theta_half_range = linspace(theta_c-pi/2, theta_c + pi/2, 200);
 circ_half = [cos(theta_half_range); sin(theta_half_range)];

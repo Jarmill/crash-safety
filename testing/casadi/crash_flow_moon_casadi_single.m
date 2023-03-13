@@ -47,8 +47,8 @@ Tmax = 5;
 % C0 = [1.5; 1]; %cool 0.
 % C0 = [1.25; 1];
 % C0 = [-1; 0]; 
-% C0 = [0; 0]; %0.3232
-C0 = [1; 0]; %0.2240
+C0 = [0; 0]; %0.3232
+% C0 = [1; 0]; %0.2240
 % C0 = [0.5; 0];
 % C0 = [0.4;-0.4]; %the coolest, has a twist, which means its a local min
 opti.subject_to(X(1:2, 1) == C0);   % start at initial point
@@ -117,11 +117,9 @@ clf
 hold on
 
 scatter(C0(1), C0(2), 200, 'ok')
-plot(sol.value(X(1, :)), sol.value(X(2, :)))
-
-theta_half_range = linspace(theta_c-pi/2, theta_c + pi/2, 200);
-circ_half = [cos(theta_half_range); sin(theta_half_range)];
-
+c = linspecer(3)
+plot(sol.value(X(1, :)), sol.value(X(2, :)), 'color', c(1, :), 'linewidth', 2)
+% plot(sol.value(X(1, :)), sol.value(X(2, :)))
 
 %draw the moon
 x_moon = moon_base(h_in, h_out);
@@ -132,9 +130,9 @@ Xu = moon_rot*x_moon*moon_scale + moon_center;
 % Xu = Cu + circ_half* Ru;
 patch(Xu(1, :), Xu(2, :), 'r', 'Linewidth', 3, 'EdgeColor', 'none', 'DisplayName', 'Unsafe Set')
 
-xlabel('x_1')
-ylabel('x_2')
-title('Crash states') 
+xlabel('$x_1$', 'interpreter', 'latex')
+ylabel('$x_2$', 'interpreter', 'latex')
+title(sprintf('Crash States (z=%0.4f)', sol.value(Z)), 'fontsize', 16) 
 pbaspect([diff(xlim), diff(ylim), 1])
 
 figure(2)
