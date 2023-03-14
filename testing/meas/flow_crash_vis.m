@@ -43,8 +43,15 @@ Xu = Cu + circ_half* Ru;
 % X0 = [0.395, 1.21; ...
 %     1.279, -1.21];
 
-X0 = [0.3948, 1.21; ...
-    1.279, -1.21];
+% X0 = [0.3948, 1.21; ...
+%     1.279, -1.21];
+
+% X0 = [0, 1; 1.297 -1.5];
+% X0 = [0, 1; 1.2966 -1.5];
+C01 = [0, 1];
+C02 = [1.2966 -1.5];
+
+X0 = {C01, C02};
 
 
 NP = size(X0, 2);
@@ -55,7 +62,7 @@ options = odeset('Events',supp_curr, 'RelTol', 1e-9);
 osm = cell(NP, 1);
 dist_close = zeros(NP, 1);
 for i = 1:NP
-    osm{i} = ode23(@(t, x) f_func(x), [0, Tmax], X0(i, :), options);
+    osm{i} = ode23(@(t, x) f_func(x), [0, Tmax], X0{i}, options);
     dist_close_curr = zeros(size(osm{i}.x));
     for k = 1:length(dist_close_curr)
         dist_close_curr(k) = aff_half_circ_dist(osm{i}.y(:, k), Ru, theta_c, Cu);        
@@ -85,12 +92,14 @@ ylim([-BOX, BOX])
 
 for i = 1:NP
     plot(osm{i}.y(1, :), osm{i}.y(2, :), 'LineWidth', 3, 'color', cc(2+i, :));
+    X0c = X0{i};
+    scatter(X0c(1), X0c(2), 100, cc(2+i, :), 'filled')
 end
-scatter(X0(:, 1), X0(:, 2), 100, 'k')
+% scatter(X0(:, 1), X0(:, 2), 100, 'k')
 plot(x_dist(1, :), x_dist(2, :), 'LineWidth', 3, 'color', 'r');
 
-xlabel('x_1')
-ylabel('x_2')
+xlabel('$x_1$', 'interpreter', 'latex')
+ylabel('$x_2$', 'interpreter', 'latex')
 
 % t2 = nexttile;
 % hold on

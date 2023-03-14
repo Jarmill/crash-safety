@@ -50,8 +50,12 @@ INIT_POINT = 1;
 
     R0 = 0.4;
 % C0 = [1; 0];
-C0 =[0.395; 1.21]; %crash bound 0.4785
-% C0 = [1.279; -1.21]; %crash bound 0.3459
+% C0 =[0.395; 1.21]; %crash bound 0.0655
+% C0 = [1.279; -1.21]; %crash bound 0.1355
+
+
+% C0 = [0; 1]; %0.3160
+C0 = [1.2966; -1.5];%0.6223
 % R0 = 0.4;
     INIT_POINT = 1;
     if INIT_POINT
@@ -67,15 +71,15 @@ C0 =[0.395; 1.21]; %crash bound 0.4785
 % opti.subject_to(X (3, 1) == Zmax);
 
 
-% Cu = [1; -0.5];
-Cu = [-0.25; -0.7];
+theta_c = 3*pi/2;
+
+Cu = [1; -0.5];
 Ru = 0.5;
 
 %unsafe set 
 
 c1f=@(x) Ru^2 - (x(1) - Cu(1)).^2 - (x(2) - Cu(2)).^2;
 
-theta_c = 5*pi/4;
 w_c = [cos(theta_c); sin(theta_c)];
 c2f =@(x) w_c(1)*(x(1) - Cu(1)) + w_c(2) * (x(2) - Cu(2)); 
 

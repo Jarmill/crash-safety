@@ -28,7 +28,8 @@ R0 = 0.4;
 
 % X0 = [0.4, 1.2; 1.25, -1.2];
 X0 = [0.395, 1.21; ...
-    1.279, -1.21];
+    1.2795, -1.21];
+%     1.279, -1.21];
 
 %% location support 
 
@@ -38,7 +39,7 @@ lsupp = lsupp.set_box([-BOX, BOX; -BOX, BOX; 0, ZMAX]);
 lsupp.Tmax = 5;
 lsupp.FREE_TERM = 0;
 lsupp.disturb = [w<=z; -w<=z];
-objective = z;
+objective = -z; %WAS WRONG. SHOULD HAVE BEEN -z, NOT z.
 
 %% describe the unsafe set
 %unsafe set
