@@ -120,8 +120,8 @@ Ru = 0.5;
     %INIT_POINT = 1
 
     %GOOD BOUNDS
-%     order=4; %5.4999e-01 (99.38 minutes)
-order=3; %4.8649e-01, time: 3.4431e+02
+    order=4; %crash cost: 5.4434e-01, time: 3.5525e+03
+% order=3; %4.8649e-01, time: 3.4431e+02
         % order=2; %4.4231e-01, time: 3.2943e+01
     % order=1; %5.8215e-02, time: 4.5774e+00
 
