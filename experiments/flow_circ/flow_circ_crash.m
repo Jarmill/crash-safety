@@ -121,7 +121,7 @@ Ru = 0.5;
 
     %GOOD BOUNDS
 %     order=4; %5.4999e-01 (99.38 minutes)
-order=3; %4.8649e-01 something. need to re-run
+order=3; %4.8649e-01, time: 3.4431e+02
         % order=2; %4.4231e-01, time: 3.2943e+01
     % order=1; %5.8215e-02, time: 4.5774e+00
 

@@ -131,9 +131,10 @@ C0 = [1; 0];
 %     order=4; %integral: 2.5884e+01, C0: -2.8276e-01, time 6583.91 sec = 109 min
 
     %v capped at 1.5*Zmax
-%     order=1; integral: 2.1926e-01, C0: 6.1800e-03
-%      order = 2; %integral: 3.8071e+00, C0: 1.8196e-01
-    order=3; %integral: 7.6824e+00, C0: 3.4372e-01
+    % order=1; %integral: 2.1926e-01, C0: 6.1800e-03, time: 3.8202e+00
+     % order = 2; %integral: 3.8107e+00, C0: 1.8229e-01,  time: 3.2956e+01
+    % order=3; %integral: 7.8781e+00, C0: 3.3978e-01, time: 3.9478e+02
+    order = 4; %
     
 
     
@@ -153,7 +154,7 @@ C0 = [1; 0];
     % out = PM.solve_program(prog)
     
     out = PM.run(order);
-    fprintf('integral: %0.4e, C0: %0.4e', out.obj, out.func.q([1; 0]));
+    fprintf('integral: %0.4e, C0: %0.4e, time: %0.4e\n', out.obj, out.func.q([1; 0]), out.time);
     
     
     load('subvalue_flow_circ_1_half.mat', 'flow_func');
