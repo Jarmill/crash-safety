@@ -129,18 +129,18 @@ Ru = 0.5;
 %     order=1;%1.1166e-07
 
 %INIT_POINT = 0; casadi crash bound
-order=1; %crash cost: 8.1010e-08
-order=2; %crash cost: 6.5897e-02
-% order=3; crash cost: 4.0539e-01
-order=4; %crash cost: 4.6316e-01, time: 36.81
-% order=5; %crash cost: 4.6381e-01, time: 868.81
+% order=1; %crash cost: 8.1010e-08, time: 7.8774e-01
+% order=2; %crash cost: 6.5897e-02 time: 6.4731e-01
+% order=3; %crash cost: 4.0539e-01, time: 3.1154e+00
+% order=4; %crash cost: 4.6316e-01, time:  2.4292e+01
+order=5; %crash cost: 4.6381e-01, time: (old) 868.81
 
     d = 2*order; 
 
     % [prog]= PM.make_program(d);
     % out = PM.solve_program(prog)
     out = PM.run(order);
-    disp(sprintf('crash cost: %0.4e', out.obj))
+    fprintf('crash cost: %0.4e, time: %0.4e\n', out.obj, out.time);
     
     wbound = out.obj;
     w_handle = @() wbound*(2*rand()-1);

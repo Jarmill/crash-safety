@@ -7,7 +7,7 @@ PROBLEM = 1;
 SOLVE = 1;
 SAMPLE = 0;
 PLOT = 0;
-PLOT_SUBVALUE = 1;
+PLOT_SUBVALUE = 0;
 
 if PROBLEM
 rng(33, 'twister')
@@ -114,19 +114,18 @@ Ru = 0.5;
 
 
     %ZMax cap of 4:
-    order=5;
-    %8.2598e+00, C0: 4.0531e-01, time: 1268.52  sec
-%         order=4;  %integral: 5.9922e+00, C0: 3.3916e-01
-%     order=3; %integral: 3.0794e+00, C0: 1.4734e-01
-%     order=2; %integral: 4.8643e-07, C0: 1.6070e-08
-%     order=1; %integral: 1.9338e-07, C0: 1.0887e-08
+    order=5;% 8.2598e+00, C0: 4.0531e-01, time: 1268.52  sec
+        % order=4;  %integral: 5.9922e+00, C0: 3.3916e-01, time: 3.2954e+01
+    % order=3; %integral: 3.0794e+00, C0: 1.4734e-01, time: 4.5363e+00
+    % % order=2; %integral: 4.8643e-07, C0: 1.6070e-08, time: 1.0282e+00
+    % order=1; %integral: 1.9338e-07, C0: 1.0887e-08, time: 6.6936e-01
 
 
     d = 2*order; 
 
     
     out = PM.run(order);
-    disp(sprintf('integral: %0.4e, C0: %0.4e', out.obj, out.func.q([1; 0])))
+     fprintf('crash cost: %0.4e, time: %0.4e\n', out.obj, out.time);
     
     load('subvalue_flow_circ_simple_4.mat', 'flow_func');
     flow_func{order} = out.func;

@@ -9,6 +9,7 @@ PLOT = 0;
 
 if PROBLEM
 rng(33, 'twister')
+yalmip('clear')
 %% generate samples
 % A_true = [-1 1; -1 -0.3];
 f_true = @(t, x) [x(2); -x(1) + (1/3).* x(1).^3 - x(2)];
@@ -117,21 +118,12 @@ Ru = 0.5;
 
     
     %INIT_POINT = 1
-    
-    %BAD BOUNDS:
-%     order = 4;% 6.2094e-01, taking 4979.66 seconds = 1.38 hours
-    %but this violates the crash-bound from crash_flow_casadi_data_driven.
-    %why? Bad conditioning? Invalid solution? BECAUSE MY CODE WAS BUGGED!
-    %Gram0 has a condition number of 4.5327e+08 (if that matters)
-%     order=3; %  5.0660e-01 (slight infeasibility, gram eig = 4*10^-5. doesn't work on sdpa_gmp, too big
-%     order = 2; %  4.6207e-01
-%     order = 1; %4.6166e-01
 
     %GOOD BOUNDS
 %     order=4; %5.4999e-01 (99.38 minutes)
 order=3; %4.8649e-01 something. need to re-run
-    %     order=2; %4.4231e-01
-%     order=1; %5.8215e-02
+        % order=2; %4.4231e-01, time: 3.2943e+01
+    % order=1; %5.8215e-02, time: 4.5774e+00
 
 
     d = 2*order; 
@@ -139,7 +131,7 @@ order=3; %4.8649e-01 something. need to re-run
     % [prog]= PM.make_program(d);
     % out = PM.solve_program(prog)
     out = PM.run(order);
-    disp(sprintf('crash cost: %0.4e', out.obj))
+    fprintf('crash cost: %0.4e, time: %0.4e\n', out.obj, out.time);
     
 end
 
