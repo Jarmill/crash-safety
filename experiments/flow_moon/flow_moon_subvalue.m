@@ -7,7 +7,7 @@ PROBLEM = 1;
 SOLVE = 1;
 SAMPLE = 0;
 PLOT = 0;
-PLOT_SUBVALUE = 1;
+PLOT_SUBVALUE = 0;
 
 if PROBLEM
 rng(33, 'twister')
@@ -138,21 +138,21 @@ Xu = struct('ineq', [con_inner; con_outer], 'eq', []);
 %     order=1; %integral: 1.9777e-07, C0: 8.8079e-09
 %     order=2;%integral: 1.4745e-07, C0: 6.8638e-10
 %     order=3; %integral: 1.1393e+00, C0: -8.8452e-02
-        order=4; %integral: 3.7723e+00, C0: -6.4243e-03
+        % order=4; %integral: 3.7723e+00, C0: -6.4243e-03
 
         %Zmax cap = 2
-    order=1; %integral: 1.9673e-07, C0: 8.7699e-09
-%     order=2;%integral: 1.3425e-07, C0: 4.6520e-10
-%     order=3; %integral: 1.0268e+00, C0: -7.8612e-02
-%     order=4; %integral: 3.1875e+00, C0: -5.6924e-03
-%     order=5; %integral: 4.5018e+00, C0: 7.7213e-02
+    % order=1; %integral: 1.9673e-07, C0: 8.7699e-09
+    % order=2;%integral: 1.3425e-07, C0: 4.6520e-10, time: 1.2286e+00
+    % order=3; %integral: 1.0268e+00, C0: -7.8612e-02, time: 2.8027e+00
+    % order=4; %integral: 3.1875e+00, C0: -5.6924e-03, time: 2.8993e+01
+    order=5; %integral: 4.5018e+00, C0: 7.7213e-02, time: 4.5781e+02
 
         
     d = 2*order; 
 
     
     out = PM.run(order);
-    disp(sprintf('integral: %0.4e, C0: %0.4e', out.obj, out.func.q([1; 0])))
+    disp(sprintf('integral: %0.4e, C0: %0.4e, time: %0.4e', out.obj, out.func.q([1; 0]), out.time))
     
     load('subvalue_flow_moon_simple_2.mat', 'flow_func');
     flow_func{order} = out.func;

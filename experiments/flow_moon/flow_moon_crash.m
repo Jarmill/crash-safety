@@ -1,7 +1,7 @@
 %data driven crash-safety estimation of the flow system
 %with a single input on x2dot
 
-%break up the sections here into functions
+%Experiment in Section 7.1.2
 
 PROBLEM = 1;
 SOLVE = 1;
@@ -139,17 +139,17 @@ Xu = struct('ineq', [con_inner; con_outer], 'eq', []);
 
     %C0 = [0; 0], casadi bound 0.3232
 %     order = 1; %crash cost: 2.7227e-08
-%     order=2; %crash cost: 1.0103e-01
-%     order=3; %crash cost: 2.9119e-01    
-%     order=4; %crash cost: 3.2158e-01
-    order=5; %crash cost: 3.2242e-01
+    % order=2; %crash cost: 1.0103e-01, time: 9.8412e-01
+    % order=3; %crash cost: 2.9119e-01, time: 2.0215e+00    
+    % order=4; %crash cost: 3.2158e-01, time: 2.4803e+01
+    order=5; %crash cost: 3.2242e-01, time: 3.2685e+02
 
     d = 2*order; 
     
 
     
     out = PM.run(order);
-    disp(sprintf('crash cost: %0.4e', out.obj))
+    fprintf('crash cost: %0.4e, time: %0.4e\n', out.obj, out.time)
     
 %     load('subvalue_flow_moon_simple_4.mat', 'flow_func');
 %     flow_func{order} = out.func;

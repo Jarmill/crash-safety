@@ -335,10 +335,10 @@ classdef location_crash_interface < handle
             end
             
             sdp_opts.sos.model = 2;
-            
+            tic;
             [sol, monom, Gram, residual] = solvesos(prog.con, prog.objective, sdp_opts, prog.coeff);
-            
-            out = struct('poly', [], 'problem', sol.problem, 'sol', [], 'block', [], 'func', []);
+            time_out = toc;
+            out = struct('poly', [], 'problem', sol.problem, 'sol', [], 'block', [], 'func', [], 'time', time_out);
             if (sol.problem == 0) || (sol.problem == 4)
                 fprintf('Recovering Solution\n')
                 %the sets X0 and X1 are disconnected in time range [0, T]

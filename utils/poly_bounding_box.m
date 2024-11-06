@@ -19,8 +19,8 @@ for i = 1:n
     
     %linprog is a minimization objective
     %be careful of signs
-    c_pos = linprog(f_pos,A,b,[],[],[],[],[],options);
-    c_neg= linprog(f_neg,A,b,[],[],[],[],[],options);
+    c_pos = linprog(f_pos,A,b,[],[],[],[],options);
+    c_neg= linprog(f_neg,A,b,[],[],[],[],options);
     
     bound_pos = -f_pos'*c_pos;
     bound_neg = f_neg'*c_neg;
